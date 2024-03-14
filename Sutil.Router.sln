@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{532E7377-FC9D-436B-9708-5A0396B85CA5}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Sutil.Router", "src\Sutil.Router\Sutil.Router.fsproj", "{39942A1D-0A04-4561-B316-A55F65C97B13}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Sutil.Router", "src\Sutil.Router.Path\Sutil.Router.Path.fsproj", "{39942A1D-0A04-4561-B316-A55F65C97B13}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "App", "src\App\App.fsproj", "{1E24E8C4-10C6-470C-8F6F-F81B33849435}"
 EndProject

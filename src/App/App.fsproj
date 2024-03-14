@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Sutil.Router\Sutil.Router.fsproj" />
+      <ProjectReference Include="..\Sutil.Router.Path\Sutil.Router.Path.fsproj" />
     </ItemGroup>
 
 </Project>

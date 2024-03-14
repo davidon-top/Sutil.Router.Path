@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageId>Sutil.Router</PackageId>
-    <Version>0.0.3</Version>
-    <Authors>Christian Sheridan</Authors>
-    <RepositoryUrl>https://github.com/sheridanchris/Sutil.Router</RepositoryUrl>
+    <PackageId>Sutil.Router.Path</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>DavidOnTop</Authors>
+    <RepositoryUrl>https://github.com/davidon-top/Sutil.Router.Path</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

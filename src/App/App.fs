@@ -1,69 +1,45 @@
-﻿open Browser
+open Browser
 open Sutil
-open Sutil.Core
 open Sutil.Router
 open Sutil.CoreElements
-open type Feliz.length
 
-type Page =
-  | Home
-  | Login
-  | UserProfile of userId: int
-  | NotFound
+let router = Router.createRouter()
 
-let getPageFromUrl (url: string list) =
-  match url with
-  | [] -> Home
-  | [ "users"; Route.Int userId ] -> UserProfile userId
-  | [ "login" ] -> Login
-  | _ -> NotFound
+let Link = Router.Link router [Attr.className "your custom attributes to apply to each link"]
+let navigate = Router.navigate router
 
-type Model = { CurrentPage: Page }
-
-let currentPage model = model.CurrentPage
-
-type Msg =
-  | Navigate of string
-  | SetPage of Page
-
-let init () =
-  let currentUrl = Router.getCurrentUrl window.location
-  let currentPage = getPageFromUrl currentUrl
-  { CurrentPage = currentPage }, Cmd.none
-
-let update (msg: Msg) (model: Model) : Model * Cmd<Msg> =
-  match msg with
-  | Navigate path -> model, Router.navigate path
-  | SetPage page -> { model with CurrentPage = page }, Cmd.none
-
-let view () =
-  let dispose _ = ()
-  let model, dispatch = () |> Store.makeElmish init update dispose
-
-  let routerSubscription =
-    Navigable.listenLocation (Router.getCurrentUrl, getPageFromUrl >> SetPage >> dispatch)
-
-  Html.div [
-    Attr.style [ Css.displayFlex; Css.flexDirectionColumn ]
-
-    Html.button [
-      Attr.style [ Css.width 350 ]
-      Attr.text "Click me to navigate to the login page!"
-      onClick (fun _ -> dispatch (Navigate "/#/login")) []
+module Pages =
+  let indexHandler() =
+    fragment [
+      Link "/" [text "Home"]; Html.br []
+      Link "/about" [text "About"]; Html.br []
+      Link "/blog/1" [text "blog 1"]; Html.br []
+      Link "/blog/2" [text "blog 2"]; Html.br []
     ]
-    Html.a [ Attr.href "/#/users/1"; Attr.text "Click me to navigate to a user's profile" ]
-    Bind.el (
-      model .> currentPage,
-      fun currentPage ->
-        let content =
-          match currentPage with
-          | Home -> "Home page"
-          | Login -> "Login page"
-          | UserProfile id -> $"Viewing user #{id}"
-          | NotFound -> "Not found!"
 
-        Html.h1 content
-    )
-  ]
+  let aboutHandler() =
+    Html.div [
+      Link "/" [text "Home"]; Html.br []
+      text "This is a fork of "
+      Html.a [Attr.href "https://github.com/sheridanchris/Sutil.Router"; text "Sutil.Router"]
+      text " by "
+      Html.a [Attr.href "https://github.com/sheridanchris/"; text "this awesome developer"]
+    ]
 
-Program.mount ("sutil-app", view ()) |> ignore // Do I ignore this?
+  let blogHandler(blogid: int) =
+    sprintf "This is a blog with an id of %i" blogid |> text
+
+  let handle404() =
+    text "Welp. What you were looking for isn't here. Unless you were looking for this message"
+
+let getHandlerFromUrl (url: string list) =
+  match url with
+  | [] -> Pages.indexHandler()
+  | [ "blog"; Route.Int blogId ] -> Pages.blogHandler(blogId)
+  | [ "about" ] -> Pages.aboutHandler()
+  | _ -> Pages.handle404()
+
+let app() =
+  Router.renderRouter router getHandlerFromUrl
+
+app() |> Program.mount

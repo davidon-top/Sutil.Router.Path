@@ -1,4 +1,4 @@
-﻿namespace Sutil.Router
+namespace Sutil.Router
 
 open System
 open Sutil
@@ -24,22 +24,39 @@ module internal Common =
 module Router =
   open Common
 
-  let getCurrentUrl (location: Location) =
-    let route =
-      if location.hash.Length > 1 then
-        location.hash.Substring 1
-      else
-        ""
+  type RouterLocation =
+    struct
+      val pathname: string
+      val query: string
+      new(location: Location) = { pathname = location.pathname; query = location.search }
+    end
 
-    if route.Contains("?") then
-      let routeValues = route.Substring(0, route.IndexOf("?"))
-      let queryParams = route.Substring(routeValues.Length + 1)
-      splitRoute routeValues @ [ queryParams ]
+  let getCurrentUrl (router: RouterLocation) =
+    let route =
+      router.pathname.TrimStart('/').TrimEnd('/')
+
+    if not (router.query = "") then
+      splitRoute route @ [ router.query.TrimStart('?') ]
     else
       splitRoute route
 
-  let navigate (url: string) : Cmd<_> =
-    Cmd.ofEffect (fun _ -> window.location.assign url)
+  let navigate (pathStore: Store<RouterLocation>) (url: string)  =
+    window.history.pushState((), "", url)
+    pathStore |> Store.modify (fun _ -> new RouterLocation(window.location))
+
+  let Link (pathStore: Store<RouterLocation>) (defaultApply: seq<Core.SutilElement>) (href: string) (apply: seq<Core.SutilElement>) =
+    Html.a (defaultApply |> Seq.append apply |> Seq.append [EngineHelpers.Attr.href href; CoreElements.onClick (fun e ->
+      e.preventDefault()
+      navigate pathStore href
+    ) []])
+
+  let createRouter() =
+    Store.make(new RouterLocation(window.location))
+
+  let renderRouter (router: Store<RouterLocation>) (conf: string list -> Core.SutilElement) =
+    Bind.el(router, (fun location ->
+      getCurrentUrl location |> conf
+    ))
 
 // Credits to Feliz.Router for these amazing active pattern definitions.
 // https://github.com/Zaid-Ajaj/Feliz.Router/blob/master/src/Router.fs#L1430
